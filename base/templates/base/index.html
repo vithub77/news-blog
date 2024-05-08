@@ -10,9 +10,9 @@
         {% for news in list_news %}
         <article class="news-box">
             <header class="news-header">
-                <h2 class="news-title">{{ news.title }}</h2>
+                <h3 class="news-title">{{ news.author }}</h3><h4>{{ news.publishedAt }}</h4>
             </header>
-            <summary class="news-summary">{{ news.description }}</summary>
+            <summary class="news-summary">{{ news.title }}</summary>
             <button class="read-more">Read More</button>
             <div class="article-content" id="article-{{ forloop.counter }}">
             </div>
