@@ -12,7 +12,7 @@
                 <h3 class="news-title">{{ news.author }}</h3><h4>{{ news.publishedAt }}</h4>
             </div>
             <summary class="news-summary">{{ news.title }}</summary>
-            <button class="read-more">Read More</button>
+            <button class="read-more" onclick="window.open('{{ news.url }}', 'blank')">Источник</button>
             <div class="article-content" id="article-{{ forloop.counter }}">
             </div>
         </article>
