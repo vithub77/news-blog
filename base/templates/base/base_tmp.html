@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'base/style.css'  %}">
+</head>
+<body>
+<header>
+  <nav>
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li><a href="" class="nav-link">В России</a></li>
+        <li><a href="" class="nav-link">В Мире</a></li>
+        <li><a href="" class="nav-link">Войти</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+    <main>
+      <section class="left-section">
+    {% block content_news %}{% endblock %}
+      </section>
+    <section class="right-section">
+
+    </section>
+
+    </main>
+</body>
+</html>

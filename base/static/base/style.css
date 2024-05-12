@@ -4,12 +4,72 @@ body {
     padding: 0;
 }
 
+header {
+  background-color: #006400;
+  color: #fff;
+  padding: 21px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #ccc;
+}
+
+.nav-menu li {
+  margin-left: 20px;
+}
+
+.nav-menu li:first-child {
+  margin-left: 0;
+}
+
+.nav-menu li:last-child {
+  margin-left: auto;
+}
+
+.left-section {
+  width: 70%;
+  float: left;
+  background-color: #f3f3f3;
+}
+
+.right-section {
+  width: 30%;
+  float: right;
+  background-color: blue;
+}
+
 .news-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-gap: 20px;
     max-width: 1200px;
     margin: 33px auto;
+    margin-top: 77px;
 }
 
 .news-box {
