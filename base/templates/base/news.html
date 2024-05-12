@@ -1,26 +1,24 @@
-<!DOCTYPE html>
-{% load static %}
-<html>
-<head>
-    <title>News</title>
-    <link rel="stylesheet" href="{% static 'base/style.css'  %}">
-</head>
-<body>
+{% extends "base/base_tmp.html" %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content_news %}
     <div class="news-grid">
         {% for news in list_news %}
-        <article style="news-box">
-            <header class="news-header">
+        <article class="news-box">
+            <div class="news-header">
                 <h3 class="news-title">{{ news.author }}</h3><h4>{{ news.publishedAt }}</h4>
-            </header>
-            <p class="news-summary">{{ news.title }}</p>
-            <button class="read-more">Read More</button>
+            </div>
+            <summary class="news-summary">{{ news.title }}</summary>
+            <button class="read-more" onclick="window.open('{{ news.url }}', 'blank')">Источник</button>
             <div class="article-content" id="article-{{ forloop.counter }}">
             </div>
         </article>
         {% endfor %}
     </div>
-</body>
-</html>
+{% endblock %}
 
 <!--    <script>-->
 <!--        const readMoreButtons = document.querySelectorAll('.read-more');-->
@@ -31,3 +29,4 @@
 <!--            });-->
 <!--        });-->
 <!--    </script>-->
+
