@@ -8,11 +8,11 @@
 <body>
     <div class="news-grid">
         {% for news in list_news %}
-        <article class="news-box">
+        <article style="news-box">
             <header class="news-header">
                 <h3 class="news-title">{{ news.author }}</h3><h4>{{ news.publishedAt }}</h4>
             </header>
-            <summary class="news-summary">{{ news.title }}</summary>
+            <p class="news-summary">{{ news.title }}</p>
             <button class="read-more">Read More</button>
             <div class="article-content" id="article-{{ forloop.counter }}">
             </div>
@@ -22,12 +22,12 @@
 </body>
 </html>
 
-    <script>
-        const readMoreButtons = document.querySelectorAll('.read-more');
-        readMoreButtons.forEach((button, index) => {
-            button.addEventListener('click', () => {
-                const articleContent = document.getElementById(`article-${index + 1}`);
-                articleContent.classList.toggle('show');
-            });
-        });
-    </script>
+<!--    <script>-->
+<!--        const readMoreButtons = document.querySelectorAll('.read-more');-->
+<!--        readMoreButtons.forEach((button, index) => {-->
+<!--            button.addEventListener('click', () => {-->
+<!--                const articleContent = document.getElementById(`article-${index + 1}`);-->
+<!--                articleContent.classList.toggle('show');-->
+<!--            });-->
+<!--        });-->
+<!--    </script>-->
