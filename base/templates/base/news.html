@@ -9,9 +9,9 @@
         {% for news in list_news %}
         <article class="news-box">
             <div class="news-header">
-                <h3 class="news-title">{{ news.author }}</h3><h4>{{ news.publishedAt }}</h4>
+                <h3 class="news-title">{{ news.author }}</h3><h4>{{ news.date }}</h4>
             </div>
-            <summary class="news-summary">{{ news.title }}</summary>
+            <summary class="news-summary">{{ news.description }}</summary>
             <button class="read-more" onclick="window.open('{{ news.url }}', 'blank')">Источник</button>
             <div class="article-content" id="article-{{ forloop.counter }}">
             </div>

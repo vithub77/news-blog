@@ -2,7 +2,7 @@ from django.utils import timezone
 from newsapi import NewsApiClient
 import datetime as dt
 
-from .models import NewsBd
+from .models import NewsBd, NewsBdEn
 from secret import api_key
 
 
@@ -16,6 +16,7 @@ class News:
     _time_ru = dt
     _time_en = dt
     _time_update_news = 0  # minutes
+    _h = 0
 
     def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
@@ -32,8 +33,9 @@ class News:
             else:
                 self._time_ru = dt.datetime.now()
                 news_json = self._api.get_top_headlines(language='ru')
+                # print(news_json)
                 self._set_news_bd(news_json.get('articles'), news_ru)
-
+                return self._list_news_ru
         else:
             if (dt.datetime.now() - dt.timedelta(minutes=self._time_update_news)) < self._time_en:
                 return self._list_news_en
@@ -41,22 +43,44 @@ class News:
                 self._time_en = dt.datetime.now()
                 news_json_en = self._api.get_top_headlines(language='en')
                 self._set_news_bd(news_json_en.get('articles'), news_ru)
+                return self._list_news_en
 
     def _set_news_bd(self, news, news_ru: bool):
-        l_time = [f"{(i.data - dt.timedelta(hours=3)).strftime('%Y-%m-%d %H:%M:%S')}" for i in NewsBd.objects.order_by('id')[:20]]
-        for n in news:
-            published_time = n.get('publishedAt')[:-1].replace('T', ' ')
-            if published_time in l_time:
-                continue
-            t = n.get('title').split('-')
-            author = t[-1].strip()
-            description = ' '.join(t[:-1])
-            url = n.get('url')
-            published_time = dt.datetime.strptime(published_time, "%Y-%m-%d %H:%M:%S") + dt.timedelta(hours=3)
-            published_time = timezone.make_aware(published_time)
-            _news = NewsBd(source=author, description=description,
-                           url=url, data=published_time)
-            _news.save()
+        if news_ru:
+            news_time = [f"{(i.data - dt.timedelta(hours=self._h)).strftime('%Y-%m-%d %H:%M:%S')}" for i in
+                         NewsBd.objects.order_by('id')[:200]]
+            for n in news:
+                published_time = n.get('publishedAt')[:-1].replace('T', ' ')
+                if published_time in news_time:
+                    continue
+                t = n.get('title').split('-')
+                author = t[-1].strip()
+                description = ' '.join(t[:-1])
+                url = n.get('url')
+                published_time = dt.datetime.strptime(published_time, "%Y-%m-%d %H:%M:%S") + dt.timedelta(hours=self._h)
+                published_time = timezone.make_aware(published_time)
+                NewsBd.objects.create(source=author, description=description,
+                                      url=url, data=published_time)
+            self._list_news_ru = [{'author': f"{_.source}", 'description': f"{_.description}",
+                                   'url': f"{_.url}", 'date': f"{_.data.strftime('%H:%M %d-%m-%Y')}"} for _ in
+                                  NewsBd.objects.order_by('-data')[:50]]
+        else:
+            news_time = [f"{(i.data - dt.timedelta(hours=3)).strftime('%Y-%m-%d %H:%M:%S')}" for i in
+                         NewsBdEn.objects.order_by('id')[:200]]
+            for n in news:
+                published_time = n.get('publishedAt')[:-1].replace('T', ' ')
+                if published_time in news_time:
+                    continue
+                t = n.get('title').split('-')
+                author = t[-1].strip()
+                description = ' '.join(t[:-1])
+                url = n.get('url')
+                published_time = dt.datetime.strptime(published_time, "%Y-%m-%d %H:%M:%S") + dt.timedelta(hours=self._h)
+                published_time = timezone.make_aware(published_time)
+                NewsBdEn.objects.create(source=author, description=description,
+                                        url=url, data=published_time)
+            self._list_news_en = [{'author': f"{_.source}", 'description': f"{_.description}",
+                                   'url': f"{_.url}", 'date': f"{_.data.strftime('%H:%M %d-%m-%Y')}"} for _ in
+                                  NewsBdEn.objects.order_by('-data')[:50]]
 
-    def _get_from_bd(self):
-        pass
+        return 0
