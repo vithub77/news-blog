@@ -19,7 +19,23 @@
         {% endfor %}
     </div>
 {% endblock %}
-
+{% block content_user %}
+  <div class="auth-window">
+    <h2>Вход или Регистрация</h2>
+    <form method="post" action="{% url 'base:login' lang=lang %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="username">Имя пользователя:</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <button type="submit" class="btn">Войти</button><a href="{% url 'base:register' lang=lang %}" style="margin-left: 200px;">Регистрация</a>
+    </form>
+  </div>
+{% endblock %}
 <!--    <script>-->
 <!--        const readMoreButtons = document.querySelectorAll('.read-more');-->
 <!--        readMoreButtons.forEach((button, index) => {-->
