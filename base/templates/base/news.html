@@ -20,9 +20,18 @@
     </div>
 {% endblock %}
 {% block content_user %}
+{% if user.is_authenticated %}
+    <h1>Hello World</h1>
+    <h1>{{ user.get_username }}</h1>
+    <h1>Hello World</h1>
+    <h1>Hello World</h1>
+    <h1>Hello World</h1>
+    <h1>Hello World</h1>
+    <h1>Hello World</h1>
+{% else %}
   <div class="auth-window">
     <h2>Вход или Регистрация</h2>
-    <form method="post" action="{% url 'base:login' lang=lang %}">
+    <form method="post" action="{% url 'base:login' %}">
       {% csrf_token %}
       <div class="form-group">
         <label for="username">Имя пользователя:</label>
@@ -35,6 +44,7 @@
       <button type="submit" class="btn">Войти</button><a href="{% url 'base:register' lang=lang %}" style="margin-left: 200px;">Регистрация</a>
     </form>
   </div>
+{% endif %}
 {% endblock %}
 <!--    <script>-->
 <!--        const readMoreButtons = document.querySelectorAll('.read-more');-->
