@@ -35,7 +35,6 @@ class MainPage(generic.ListView):
 
 def register_user(request, lang):
     if request.user.is_authenticated:
-        print(request.user.get_username, 1111111)
         url_redirect = reverse('base:main_page', args=(lang, request.user.get_username()))
         return redirect(url_redirect)
     else:
