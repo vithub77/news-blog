@@ -8,6 +8,7 @@ from django.views import generic
 from django.urls import reverse_lazy
 
 from .news import News
+from .forms import UserLoginForm
 
 
 def index(request):
@@ -18,6 +19,7 @@ def index(request):
 
 class MainPage(generic.ListView):
     news = News()
+    form = UserLoginForm()
     template_name = "base/news.html"
     context_object_name = "list_news"
 
@@ -27,6 +29,7 @@ class MainPage(generic.ListView):
         context['title'] = 'Новости России' if lang == 'ru' else 'Новости в Мире'
         context['lang'] = lang
         context['username'] = self.kwargs.get('username')
+        context['form'] = self.request.GET.get('form', self.form)   # self.form if not self.request.user.is_authenticated else '<h1>He World</h1>'
         return context
 
     def get_queryset(self):
@@ -45,6 +48,9 @@ def register_user(request, lang):
                 user = User.objects.create_user(username=username, password=psw)
                 login(request, user)
                 url_redirect = reverse('base:main_page', args=(lang, username))
+                return redirect(url_redirect)
+            else:
+                url_redirect = reverse('base:register', args=(lang,))
                 return redirect(url_redirect)
 
         news = News()
@@ -96,16 +102,29 @@ def register_user(request, lang):
 
 def user_login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        psw = request.POST.get('password')
-        user = authenticate(username=username, password=psw)
-        if user:
-            login(request, user)
-            username = request.session.get('username')
-            url_redirect = reverse('base:main_page', args=('ru', username))
-            return redirect(url_redirect)
+        form = UserLoginForm(data=request.POST)
+        if form.is_valid():
+            username = request.POST.get('username')
+            psw = request.POST.get('password')
+            user = authenticate(username=username, password=psw)
+            if user:
+                login(request, user)
+                url_redirect = reverse('base:main_page', args=('ru', username))
+                return redirect(url_redirect)
         else:
-            return HttpResponse(f'Hello world Nouser')
+            news = News()
+            list_news = news.get_news(news_ru=True)
+            context = {'form': form, 'lang': 'ru', 'username': 'anon', 'list_news': list_news}
+            return render(request, 'base/news.html', context)
+    # else:
+    #     form = UserLoginForm
+    #     news = News()
+    #     list_news = news.get_news(news_ru=True)
+    #     context = {'form': form, 'lang': 'ru', 'username': 'anon', 'list_news': list_news}
+    #     return render(request, 'base/news.html', context)
+    else:
+        url_redirect = reverse('base:main_page', args=('ru', 'anon'))
+        return redirect(url_redirect)
 
 
 def user_logout(request, lang):

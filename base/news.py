@@ -1,6 +1,7 @@
 from django.utils import timezone
 from newsapi import NewsApiClient
 import datetime as dt
+import requests
 
 from .models import NewsBd, NewsBdEn
 from secret import api_key
@@ -53,10 +54,10 @@ class News:
                 published_time = n.get('publishedAt')[:-1].replace('T', ' ')
                 if published_time in news_time:
                     continue
+                url = n.get('url')
                 t = n.get('title').split('-')
                 author = t[-1].strip()
                 description = ' '.join(t[:-1])
-                url = n.get('url')
                 published_time = dt.datetime.strptime(published_time, "%Y-%m-%d %H:%M:%S") + dt.timedelta(hours=self._h)
                 published_time = timezone.make_aware(published_time)
                 NewsBd.objects.create(source=author, description=description,

@@ -33,13 +33,16 @@
     <h2>Вход или Регистрация</h2>
     <form method="post" action="{% url 'base:login' %}">
       {% csrf_token %}
+        {% if form.non_field_errors %}
+        <p style="font: italic;margin-bottom: 10px; color: red">Не правильный логин или пароль</p>
+        {% endif %}
       <div class="form-group">
-        <label for="username">Имя пользователя:</label>
-        <input type="text" id="username" name="username" required>
+        <label for="{{ form.username.id_for_label }}">Имя пользователя:</label>
+          {{ form.username }}
       </div>
       <div class="form-group">
-        <label for="password">Пароль:</label>
-        <input type="password" id="password" name="password" required>
+        <label for="{{ form.password.id_for_label }}">Пароль:</label>
+          {{ form.password }}
       </div>
       <button type="submit" class="btn">Войти</button><a href="{% url 'base:register' lang=lang %}" style="margin-left: 200px;">Регистрация</a>
     </form>
