@@ -2,13 +2,10 @@ from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
-from django.urls import reverse_lazy
 
 from .news import News
-from .forms import UserLoginForm
+from .forms import UserLoginForm, UserRegisterForm
 
 
 def index(request):
@@ -29,7 +26,8 @@ class MainPage(generic.ListView):
         context['title'] = 'Новости России' if lang == 'ru' else 'Новости в Мире'
         context['lang'] = lang
         context['username'] = self.kwargs.get('username')
-        context['form'] = self.request.GET.get('form', self.form)   # self.form if not self.request.user.is_authenticated else '<h1>He World</h1>'
+        context['form'] = self.request.GET.get('form',
+                                               self.form)  # self.form if not self.request.user.is_authenticated else '<h1>He World</h1>'
         return context
 
     def get_queryset(self):
@@ -42,7 +40,9 @@ def register_user(request, lang):
         return redirect(url_redirect)
     else:
         if request.method == "POST":
-            if request.POST['password1'] == request.POST['password2']:
+            form = UserRegisterForm(data=request.POST)
+            if form.is_valid():
+                # form.save()
                 username = request.POST['username']
                 psw = request.POST['password1']
                 user = User.objects.create_user(username=username, password=psw)
@@ -50,54 +50,18 @@ def register_user(request, lang):
                 url_redirect = reverse('base:main_page', args=(lang, username))
                 return redirect(url_redirect)
             else:
-                url_redirect = reverse('base:register', args=(lang,))
-                return redirect(url_redirect)
+                news = News()
+                list_news = news.get_news(news_ru=True if lang == 'ru' else False)
+                title = 'Новости России-Регистрация' if lang == 'ru' else 'Новости в Мире-Регистрация'
+                context = {'title': title, 'form': form, 'lang': lang, 'username': 'anon', 'list_news': list_news}
+                return render(request, 'base/register.html', context)
 
         news = News()
         list_news = news.get_news(news_ru=True if lang == 'ru' else False)
         title = 'Новости России-Регистрация' if lang == 'ru' else 'Новости в Мире-Регистрация'
-        context = {'list_news': list_news, 'lang': lang, 'title': title, 'username': 'anonym'}
+        form = UserRegisterForm()
+        context = {'list_news': list_news, 'lang': lang, 'title': title, 'username': 'anonym', 'form': form}
         return render(request, "base/register.html", context)
-
-
-# class RegisterUser(generic.ListView):
-#     form_class = UserCreationForm
-#     news = News()
-#     template_name = "base/register.html"
-#     context_object_name = "list_news"
-#     success_url = reverse_lazy('login')
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         print(self.kwargs, '111111111')
-#         lang = self.kwargs.get('lang', 'ru')
-#         context['title'] = 'Новости России-Регистрация' if lang == 'ru' else 'Новости в Мире-Регистрация'
-#         context['lang'] = lang
-#         return context
-#
-#     def get_queryset(self):
-#         return self.news.get_news(news_ru=True if self.kwargs['lang'] == 'ru' else False)
-
-
-# def register(request, lang):
-#     # return HttpResponse('страница Рега')
-#     # form_class = UserCreationForm
-#     return render(request, 'base/register.html')
-
-# class Login(generic.ListView):
-#     news = News()
-#     template_name = "base/user.html"
-#     context_object_name = "list_news"
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         lang = self.kwargs.get('lang', 'ru')
-#         context['title'] = 'Новости России' if lang == 'ru' else 'Новости в Мире'
-#         context['lang'] = lang
-#         return context
-#
-#     def get_queryset(self):
-#         return self.news.get_news(news_ru=True if self.kwargs['lang'] == 'ru' else False)
 
 
 def user_login(request):
@@ -116,12 +80,6 @@ def user_login(request):
             list_news = news.get_news(news_ru=True)
             context = {'form': form, 'lang': 'ru', 'username': 'anon', 'list_news': list_news}
             return render(request, 'base/news.html', context)
-    # else:
-    #     form = UserLoginForm
-    #     news = News()
-    #     list_news = news.get_news(news_ru=True)
-    #     context = {'form': form, 'lang': 'ru', 'username': 'anon', 'list_news': list_news}
-    #     return render(request, 'base/news.html', context)
     else:
         url_redirect = reverse('base:main_page', args=('ru', 'anon'))
         return redirect(url_redirect)
@@ -131,3 +89,19 @@ def user_logout(request, lang):
     logout(request)
     url_redirect = reverse('base:main_page', args=(lang, 'anon'))
     return redirect(url_redirect)
+
+
+def comments_view(request, lang, username, news_id):
+    if request.method == 'POST':
+        data = {'lang': lang, 'username': username,
+                'news_id': news_id, 'text': request.POST.get('comment_text')}
+        News.set_comments(data)
+    # if username != 'anon':
+    #     user = User.objects.get(username=username)
+    #     date_joined = user.date_joined.strftime('%d-%m-%Y')
+    form = UserLoginForm()
+    json_comments = News.get_news_comments(news_id, lang)
+    title = f'Комментарии: {" ".join(json_comments.get("description").split()[:2])}'
+    context = {'title': title, 'username': username, 'lang': lang, 'form': form,
+               'json_comments': json_comments}
+    return render(request, 'base/comments.html', context)

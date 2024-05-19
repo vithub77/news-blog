@@ -34,7 +34,6 @@ class News:
             else:
                 self._time_ru = dt.datetime.now()
                 news_json = self._api.get_top_headlines(language='ru')
-                # print(news_json)
                 self._set_news_bd(news_json.get('articles'), news_ru)
                 return self._list_news_ru
         else:
@@ -63,7 +62,8 @@ class News:
                 NewsBd.objects.create(source=author, description=description,
                                       url=url, data=published_time)
             self._list_news_ru = [{'author': f"{_.source}", 'description': f"{_.description}",
-                                   'url': f"{_.url}", 'date': f"{_.data.strftime('%H:%M %d-%m-%Y')}"} for _ in
+                                   'url': f"{_.url}", 'date': f"{_.data.strftime('%H:%M %d-%m-%Y')}",
+                                   'news_id': _.id, 'comments_count': _.comments_set.count()} for _ in
                                   NewsBd.objects.order_by('-data')[:50]]
         else:
             news_time = [f"{(i.data - dt.timedelta(hours=3)).strftime('%Y-%m-%d %H:%M:%S')}" for i in
@@ -81,7 +81,43 @@ class News:
                 NewsBdEn.objects.create(source=author, description=description,
                                         url=url, data=published_time)
             self._list_news_en = [{'author': f"{_.source}", 'description': f"{_.description}",
-                                   'url': f"{_.url}", 'date': f"{_.data.strftime('%H:%M %d-%m-%Y')}"} for _ in
+                                   'url': f"{_.url}", 'date': f"{_.data.strftime('%H:%M %d-%m-%Y')}",
+                                   'news_id': _.id, 'comments_count': _.commentsen_set.count()} for _ in
                                   NewsBdEn.objects.order_by('-data')[:50]]
 
         return 0
+
+    @staticmethod
+    def get_news_comments(news_id, lang):
+        n = NewsBd.objects.get(pk=news_id) if lang == 'ru' else NewsBdEn.objects.get(pk=news_id)
+        _com_list = n.comments_set.all().order_by(
+            'publication_date') if lang == 'ru' else n.commentsen_set.all().order_by('publication_date')
+        comments = [
+            {'user': _.author, 'publication_date': _.publication_date.strftime('%H:%M %d-%m-%Y'), 'text': _.text}
+            for _ in _com_list]
+        result = {'description': f"{n.description}", 'source': f"{n.source}", 'url': f"{n.url}", 'news_id': news_id,
+                  'list_comments': comments}
+        return result
+
+    @staticmethod
+    def set_comments(data):
+        lang, news_id = data.get('lang'), data.get('news_id')
+        n = NewsBd.objects.get(pk=news_id) if lang == 'ru' else NewsBdEn.objects.get(pk=news_id)
+        if lang == "ru":
+            n.comments_set.create(author=data.get('username'), text=data.get('text'))
+        else:
+            n.commentsen_set.create(author=data.get('username'), text=data.get('text'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+

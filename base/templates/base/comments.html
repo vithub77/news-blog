@@ -1,0 +1,64 @@
+{% extends "base/base_tmp.html" %}
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content_news %}
+    <article class="news">
+        <h2>{{ json_comments.description }}</h2>
+        <p>Ресурс: <b>{{ json_comments.source }}</b></p><a href="{{ json_comments.url }}" target="_blank">Перейти на ресурс</a>
+    </article>
+
+    <section class="comments">
+        {% if json_comments.list_comments %}
+        {% for com in json_comments.list_comments %}
+            <h4>Комментарий от: {{ com.user }}</h4>
+            <div class="comment">
+                <p style="font-style: italic; color: #cccccc;">Дата и время: {{ com.publication_date }}</p>
+                <p style="font-style: italic;">{{ com.text }}</p>
+            </div>
+        {% endfor %}
+        {% else %}
+        <div class="comment">
+           <p style="font-style: italic;">Нет комментариев</p>
+            </div>
+        {% endif %}
+    </section>
+  {% if user.is_authenticated %}
+    <form class="new-comment" method="post" action="{% url 'base:comments' lang json_comments.news_id username %}">
+        {% csrf_token %}
+        <h2>Оставить комментарий</h2>
+        <textarea placeholder="Введите ваш комментарий" name="comment_text"></textarea>
+        <button type="submit">Отправить</button>
+  {% endif %}
+    </form>
+{% endblock %}
+{% block content_user %}
+{% if user.is_authenticated %}
+    <h1>Hello World</h1>
+    <h1>Пользователь: {{ user.get_username }}</h1>
+    <h1>Hello World</h1>
+    <h1>Hello World</h1>
+    <h1>Hello World</h1>
+    <h1>Hello World</h1>
+{% else %}
+  <div class="auth-window">
+    <h2>Вход или Регистрация</h2>
+    <form method="post" action="{% url 'base:login' %}">
+      {% csrf_token %}
+        {% if form.non_field_errors %}
+        <p style="font: italic;margin-bottom: 10px; color: red">Не правильный логин или пароль</p>
+        {% endif %}
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">Имя пользователя:</label>
+          {{ form.username }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Пароль:</label>
+          {{ form.password }}
+      </div>
+      <button type="submit" class="btn">Войти</button><a href="{% url 'base:register' lang=lang %}" style="margin-left: 200px;">Регистрация</a>
+    </form>
+  </div>
+{% endif %}
+{% endblock %}

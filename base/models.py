@@ -29,7 +29,6 @@ class NewsBdEn(models.Model):
     data = models.DateTimeField(null=True)
     count_comments = models.IntegerField(default=0)
 
-
     def __str__(self):
         return self.url
 

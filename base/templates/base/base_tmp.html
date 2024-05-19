@@ -14,7 +14,7 @@
           <ul class="nav-menu">
             <li><a href="{% url 'base:main_page' 'ru' username %}" class="nav-link">В России</a></li>
             <li><a href="{% url 'base:main_page' 'en' username %}" class="nav-link">В Мире</a></li>
-{% if user.is_authenticated %}<li><a href="{% url 'base:logout' lang %}" style="color: #fff;
+             {% if user.is_authenticated %}<li><a href="{% url 'base:logout' lang %}" style="color: #fff;
                                                      margin-left: 800px;
                                                      text-decoration: none;
                                                      font-size: 16px;
