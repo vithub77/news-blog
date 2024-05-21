@@ -116,6 +116,12 @@ header {
     background-color: #3e8e41;
 }
 
+
+
+.like-button:hover {
+  background-color: #ff7f50; /* Lighter coral color on hover */
+}
+
 .article-content {
     display: none;
 }
@@ -166,6 +172,7 @@ header {
   width: 100%;
 }
 
+
 .btn {
   background-color: #006400;
   border: none;
@@ -177,7 +184,16 @@ header {
 }
 
 .btn:hover {
-  background-color: #0056b3;
+  background-color:  #006500;
+}
+
+
+.news-item {
+  position: relative;
+}
+
+.like-button:hover {
+  background-color: #ff7f50;
 }
 
 .news, .comments, .new-comment {

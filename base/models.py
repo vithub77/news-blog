@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class NewsBd(models.Model):
@@ -41,3 +42,18 @@ class CommentsEn(models.Model):
 
     def __str__(self):
         return self.author
+
+
+class PosNews(models.Model):
+    news = models.ForeignKey(NewsBd, on_delete=models.CASCADE)
+    username = models.CharField(max_length=100, default='')
+
+
+# class UserProfile(models.Model):
+#     person = models.ForeignKey(User, on_delete=models.CASCADE, related_name='profile')
+#     avatar = models.ImageField(upload_to='profile_photos', default='user.jpg')
+
+    # @property
+    # def avatar_url(self):
+    #     if self.avatar and hasattr(self.avatar, 'url'):
+    #         return self.avatar.url

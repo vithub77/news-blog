@@ -18,6 +18,15 @@
 
             </div>
             <button class="read-more" onclick="window.open('{{ news.url }}', 'blank')">Источник</button>
+              {% if user.is_authenticated %}
+                {% if news.news_id not in request.session.list_id %}
+            <form hx-post="{% url 'base:save_news' lang news.news_id username %}">
+                {% csrf_token %}
+                <button style="margin:10px;" class="#">Отложить</button></form>
+                {% else %}
+            <p>Новость отложена</p>
+                {% endif %}
+              {% endif %}
             <div class="article-content" id="article-{{ forloop.counter }}">
             </div>
         </article>
@@ -26,13 +35,7 @@
 {% endblock %}
 {% block content_user %}
 {% if user.is_authenticated %}
-    <h1>Hello World</h1>
-    <h1>{{ user.get_username }}</h1>
-    <h1>Hello World</h1>
-    <h1>Hello World</h1>
-    <h1>Hello World</h1>
-    <h1>Hello World</h1>
-    <h1>Hello World</h1>
+    {% include 'base/user_section.html' %}
 {% else %}
   <div class="auth-window">
     <h2>Вход или Регистрация</h2>

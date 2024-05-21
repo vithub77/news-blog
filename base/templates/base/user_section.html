@@ -1,0 +1,8 @@
+<h1>Hello World</h1>
+<p style="font-size: 20px;">Пользователь: <b>{{ user.get_username }}</b></p>
+        <h2>Отложенные новости</h2>
+    <ul>
+        {% for news in request.session.list_postnews %}
+            <li style="margin-top:12px;"><a href="{{ news.url }}" target="_blank">{{ news.description }}</a></li>
+        {% endfor %}
+    </ul>

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.views import generic
 
@@ -9,6 +10,7 @@ from .forms import UserLoginForm, UserRegisterForm
 
 
 def index(request):
+    # request.session['list_id'] = None
     name = request.user.get_username() if request.user.is_authenticated else 'anon'
     url_redirect = reverse('base:main_page', args=('ru', name))
     return redirect(url_redirect)
@@ -47,6 +49,9 @@ def register_user(request, lang):
                 psw = request.POST['password1']
                 user = User.objects.create_user(username=username, password=psw)
                 login(request, user)
+                n = News.get_news_postponed(username)
+                request.session['list_postnews'] = n[0]
+                request.session['list_id'] = n[1]
                 url_redirect = reverse('base:main_page', args=(lang, username))
                 return redirect(url_redirect)
             else:
@@ -73,6 +78,11 @@ def user_login(request):
             user = authenticate(username=username, password=psw)
             if user:
                 login(request, user)
+                n = News.get_news_postponed(username)
+                request.session['list_postnews'] = n[0]
+                request.session['list_id'] = n[1]
+                print(n[1], '111111111111111111111111')
+                request.session.modified = True
                 url_redirect = reverse('base:main_page', args=('ru', username))
                 return redirect(url_redirect)
         else:
@@ -105,3 +115,14 @@ def comments_view(request, lang, username, news_id):
     context = {'title': title, 'username': username, 'lang': lang, 'form': form,
                'json_comments': json_comments}
     return render(request, 'base/comments.html', context)
+
+
+@login_required
+def save_news(request, lang, username, news_id):
+    # request.user.saved_news.add(news)
+    News.set_news_user(lang, username, news_id)
+    n = News.get_news_postponed(username)
+    request.session['list_postnews'] = n[0]
+    request.session['list_id'] = n[1]
+    request.session.modified = True
+    return HttpResponse("Новость отложена")

@@ -3,7 +3,7 @@ from newsapi import NewsApiClient
 import datetime as dt
 import requests
 
-from .models import NewsBd, NewsBdEn
+from .models import NewsBd, NewsBdEn, PosNews
 from secret import api_key
 
 
@@ -16,7 +16,7 @@ class News:
     _api = NewsApiClient
     _time_ru = dt
     _time_en = dt
-    _time_update_news = 0  # minutes
+    _time_update_news = 20  # minutes
     _h = 0
 
     def __new__(cls, *args, **kwargs):
@@ -108,16 +108,17 @@ class News:
         else:
             n.commentsen_set.create(author=data.get('username'), text=data.get('text'))
 
+    @staticmethod
+    def set_news_user(lang, username, news_id):
+        n = NewsBd.objects.get(pk=news_id)
+        post, created = n.posnews_set.get_or_create(username=username)
+        print(post, created, "post, created")
 
-
-
-
-
-
-
-
-
-
-
-
-
+    @staticmethod
+    def get_news_postponed(username):
+        list_id = [_.news_id for _ in PosNews.objects.filter(username=username)]
+        list_news = [{'author': f"{_.source}", 'description': f"{_.description}",
+                      'url': f"{_.url}", 'date': f"{_.data.strftime('%H:%M %d-%m-%Y')}",
+                      'news_id': _.id, 'comments_count': _.comments_set.count()} for i in list_id for _ in
+                     NewsBd.objects.filter(pk=i)]
+        return list_news, list_id
