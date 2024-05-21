@@ -1,3 +1,8 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+admin.site.register(NewsBd)
+admin.site.register(NewsBdEn)
+admin.site.register(Comments)
+admin.site.register(CommentsEn)
+admin.site.register(PosNews)
