@@ -1,4 +1,4 @@
-## Это сайт с самыми свежим новостями
+## Это сайт с самыми свежим новостями на Django
 ### https://vithub777.pythonanywhere.com/
 
 Новости от Google-News API, 
