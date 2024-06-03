@@ -16,8 +16,9 @@ class News:
     _api = NewsApiClient
     _time_ru = dt
     _time_en = dt
-    _time_update_news = 20  # minutes
+    _time_update_news = 0  # minutes
     _h = 0
+    _m = 0
 
     def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
@@ -43,6 +44,7 @@ class News:
                 self._time_en = dt.datetime.now()
                 news_json_en = self._api.get_top_headlines(language='en')
                 self._set_news_bd(news_json_en.get('articles'), news_ru)
+                print(self._list_news_en, 1111111)
                 return self._list_news_en
 
     def _set_news_bd(self, news, news_ru: bool):
@@ -66,7 +68,7 @@ class News:
                                    'news_id': _.id, 'comments_count': _.comments_set.count()} for _ in
                                   NewsBd.objects.order_by('-data')[:50]]
         else:
-            news_time = [f"{(i.data - dt.timedelta(hours=3)).strftime('%Y-%m-%d %H:%M:%S')}" for i in
+            news_time = [f"{(i.data - dt.timedelta(hours=self._h)).strftime('%Y-%m-%d %H:%M:%S')}" for i in
                          NewsBdEn.objects.order_by('id')[:200]]
             for n in news:
                 published_time = n.get('publishedAt')[:-1].replace('T', ' ')
